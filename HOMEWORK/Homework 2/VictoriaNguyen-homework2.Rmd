@@ -1,0 +1,326 @@
+---
+title: "STAT167 HW2 - Spring 2022"
+author: "Victoria Nguyen"
+output:
+  pdf_document:
+    toc: yes
+  html_document:
+    toc: yes
+---
+
+***
+
+## **Homework #2 instructions**
+
+**Review [textbook Chapter 3 "Data visualization"](https://r4ds.had.co.nz/data-visualisation.html) and lecture notes on `ggplot2` (2022/4/12 & 2022/4/14) before answering the homework questions**.
+
+This homework contains 2 questions, each with multiple parts, 100 points in total.   
+
+<font color="blue">Replace **INSERT_YOUR_ANSWER** with your own answers.</font>
+
+- First open this `rmd` file in RStudio and click `Knit -> Knit to PDF` to render it to PDF format. You need to have `LaTex` installed on the computer to render it to PDF format. If not, you can also render it to HTML format.
+- It is best to read this `rmd` file and the rendered `html` file side-by-side, while you are working on this homework.
+- If the question asks you to write some R code, remember to put your code into a **R code chunk**. Make sure both your R code chunk and its output are visible in the rendered `html` file.
+- For this homework, use **ggplot2** to visualize your data. Do **NOT** use R base graphics functions.
+
+- <font color="blue">**Please comment your R code thoroughly, and follow the R coding style guideline (https://google.github.io/styleguide/Rguide.xml). Partial credit will be deducted for insufficient commenting or poor coding styles.**</font>
+
+- If you have any question about this homework assignment, we encourage you to post it on [**Piazza**](http://piazza.com/ucr/spring2022/stat167/home).
+
+### **Homework submission guideline**
+
+- **This homework is DUE at _11:59 PM_ on _Sunday April 17, 2022_**.
+- Late submission penalties.  
+    - Submissions up to 24 hours late will incur a 10% deduction.  
+    - Submissions up to 48 hours late will incur a 30% deduction.
+
+- <font color="blue">**If you are using one or both of your free late days, please state here: **</font> 
+
+- After you complete all questions, save your `rmd` file to `FirstnameLastname-SID-HW2.rmd` and save the rendered pdf file to `FirstnameLastname-SID-HW2.pdf`. If you can not knit it to pdf, knit it to html first and then print/save it to pdf format. 
+- Submit **BOTH your source `rmd` file and the knitted `pdf` file** to **GradeScope**. Do NOT create a zip file. For the `pdf` submission, please tag specific pages that correspond with each question in the assignment.
+- You can submit multiple times, you last submission will be graded.
+
+***
+
+## **Acknowledgments**
+
+<font color="blue">
+Please list all the help you have received for completing this homework.
+</font>
+
+[https://ggplot2.tidyverse.org/reference/geom_bar.html](https://ggplot2.tidyverse.org/reference/geom_bar.html)
+
+
+***
+
+**Load necessary packages**
+
+```{r, collapse=T}
+# install the tidyverse package first if you have not done it yet.
+#install.packages("tidyverse") # you can comment out this line after you have installed `tidyverse`
+
+library(tidyverse) # for the `ggplot2` package
+library(gridExtra) # for gridding last question
+library(ggplot2)
+library(dplyr)
+library(viridis)
+```
+
+***
+
+
+## **Question 1 [60pt] Visualization of the `mpg` data set**
+
+This data set contains fuel economy data 1999 - 2008 for 38 popular car models (source: EPA [http://fueleconomy.gov](http://fueleconomy.gov)).
+
+```{r, collapse=T}
+?mpg
+dim(mpg)  # dimension of the table
+names(mpg)  # list the variables in mpg
+str(mpg)  # list the structures in mpg
+glimpse(mpg) # get a glimpse of the mpg data
+```
+
+### (a) [10pt] Aesthetic mapping of `color`
+
+(i) What's gone wrong with the following code? Why are the points not blue?
+
+```{r, collapse=T}
+ggplot(data = mpg) + 
+  geom_point(mapping = aes(x = displ, y = hwy, color = "blue"))
+```
+
+In this code, color = "blue" is a part of the aesthetic mapping. I believe this means that further code would be applied to any points that already have color = "blue" applied to them. If we wanted the color to correctly be applied to the points, we must move it outside of the parentheses where we are setting x=displ and y=hwy. 
+
+Modify the code to plot blue points.
+
+
+```{r, collapse=T}
+ggplot(data = mpg) + 
+  geom_point(mapping = aes(x = displ, y = hwy), color = "blue")
+```
+
+(ii) What happens if you map an aesthetic to something other than a variable name, like `aes(colour = displ < 5)`? Note, you'll also need to specify x and y.
+
+In the case of using `aes(colour = displ < 5)`, the boolean function will be used for the aesthetic graphing -- points with a displ value below 5 will be assigned a color for "true", while points with a displ value of 5 of greater will be assigned a different value for "false".
+
+```{r, collapse=T}
+ggplot(mpg, aes(x = displ, y = hwy, colour = displ < 5)) +
+  geom_point()
+```
+
+
+### (b) [20pt] Reproducing figures
+
+Write your own ggplot code to reproduce the following four plots. 
+When generating these plots, focus on the aesthetic mappings in the reference plot. It is OK if the text font size or point size in your plot look different from the reference plot. 
+
+(i) Reproduce this plot:
+
+![](/Users/victoria/Desktop/UCR SPRING 2022/STAT 167/HOMEWORK/Homework 2/hw2-q1-b-i.png)
+
+```{r}
+ggplot(mpg, aes(x = displ, y = hwy)) +
+  geom_smooth(mapping = aes(group = drv), size = 2, se = FALSE) +
+  geom_point(size = 4, color = "black")
+```
+
+(ii) Reproduce this plot:
+
+![](/Users/victoria/Desktop/UCR SPRING 2022/STAT 167/HOMEWORK/Homework 2/hw2-q1-b-ii.png)
+
+```{r}
+ggplot(mpg, aes(x = displ, y = hwy, colour = drv)) +
+  geom_point(size = 4) +
+  geom_smooth(se = FALSE, size = 2)
+```
+
+(iii) Reproduce this plot:
+
+![](/Users/victoria/Desktop/UCR SPRING 2022/STAT 167/HOMEWORK/Homework 2/hw2-q1-b-iii.png)
+
+```{r}
+ggplot(mpg, aes(x = displ, y = hwy)) +
+  geom_point(aes(colour = drv), size = 4) +
+  geom_smooth(size = 2, se = FALSE)
+```
+
+(iv) Reproduce this plot:
+
+![](/Users/victoria/Desktop/UCR SPRING 2022/STAT 167/HOMEWORK/Homework 2/hw2-q1-b-iv.png)
+
+```{r}
+ggplot(mpg, aes(x = displ, y = hwy)) +
+  geom_smooth(aes(linetype = drv),size = 2, se = FALSE)+
+  geom_point(aes(colour = drv), size = 4)
+```
+
+### (c) [10pt] Facets
+
+There are two ways to add additional variable(s) to a 2D plot. One is using aesthetics, the other one is using facets.
+
+(i) Make a scatter plot that x-axis is `displ` and y-axis is `hwy`. Use different colors to distinguish `drv` types.
+
+```{r}
+ggplot(data = mpg) +
+  geom_point(mapping = aes(x = displ, y = hwy, color = drv))
+```
+
+(ii) Facet `drv` into the rows. That is, make several **rows** of subplots, one row for each `drv` type. Each subplot has `displ` mapped to the x-axis and `hwy` mapped to the y-axis. **Hint**: Use `nrow` or `ncol` to control the layout of the individual panels.
+
+```{r}
+ggplot(data = mpg) +
+  geom_point(mapping = aes(x = displ, y = hwy, color = drv))+
+  facet_wrap(~ drv, nrow = 3) # using nrow to control the layout of the panels
+```
+
+### (d) [10pt] `stat` functions
+
+Most `geom` functions and `stat` functions come in pairs that are almost always used in concert. 
+
+- every `geom` has a default `stat`
+- every `stat` has a default `geom` 
+
+Look up the default `stat` functions for the `geom` functions listed in the following table. Also, find out the variables computed by the default `stat` function (See the **Computed variables** section in the documentation page).
+
+?geom_point
+| `geom` function  | default `stat` function  | variables computed by the default `stat` function  |
+|---------------------|-------------------|-----------------------------------------|
+| `geom_bar()`        | stat_count        | count, prop |
+| `geom_histogram()`  | stat_bin          | count, density, ncount, ndensity, width |
+| `geom_density()`    | stat_density      | density, count, scaled, ndensity |
+| `geom_point()`      | stat_identity     | none? |
+| `geom_smooth()`     | stat_smooth       | y, x, ymin, xmin, ymax, xmax, se |
+
+Some `geom` function has stat = "identity" as the default. What does that mean?
+
+using identity makes the height of the bars or points in the graphs represent the data's values.
+
+**Notes**: Table formatting are sometimes tricky using R Markdown. [Table Generator](http://www.tablesgenerator.com/markdown_tables) is a handy tool if you need to make tables in the future.
+
+
+### (e) [10pt] Position adjustment options for `geom_bar()`
+
+Choose two categorical variables from the `mpg` data set and use them to illustrate the following four position adjustment options for `geom_bar()`:
+
+- **default**: position = "stack"
+- position = "identity" will place each object exactly where it falls in the context of the graph. 
+- position = "fill" works like stacking, but makes each set of stacked bars the same height. 
+- position = "dodge" places overlapping objects directly beside one another. 
+the bars are automatically stacked. Each colored rectangle represents a combination of cut and clarity.
+
+```{r}
+#creating the initial plot
+gg <- ggplot(data = mpg, 
+             mapping = aes(x = manufacturer, fill = drv)) 
+
+#assigning the 4 different types of bar graphs
+stack_plot <- gg + geom_bar(position="stack") 
+identity_plot <- gg + geom_bar(position="identity") 
+fill_plot <- gg + geom_bar(position="fill") 
+dodge_plot <- gg + geom_bar(position="dodge") 
+
+#arranging the plots into 2 columns
+grid.arrange(stack_plot, identity_plot, fill_plot, dodge_plot, ncol=2) 
+
+```
+
+Which position option do you like most? What conclusions can you draw from your plot?
+
+I like the stack position the most because it doesn't cause any alterations to the data and makes the data very easy to read without having to put much thought into the interpretation. The plot(s) show how many of each type of drive train (front wheel, rear wheel, or four wheel) each car manufacturer makes (out of the fuel economy data set from 1999-2008, from 38 popular models of cars). 
+
+We can see that the only Volkswagen cars included in this data set are front wheel drive, about half of the toyota cars included are front wheel drive and the other half is four wheel drive, only 3 manufacturers make rear wheel drive cars, and only one company made cars with all 3 different types of drive train.
+
+***
+
+
+## **Question 2 [40pt] Visualization the `quakes` data set**
+Recall that the `quakes` data set contain the locations of 1000 seismic events of MB > 4.0. The events occurred in a cube near Fiji since 1964.
+
+```{r}
+library(datasets)
+?quakes 
+```
+
+```{r, collapse=T}
+class(quakes)
+head(quakes, n=5) # print first 5 rows of quakes
+dim(quakes)  # dimension of the table
+names(quakes)  # list the variables in quakes
+str(quakes)  # list the structures in quakes
+glimpse(quakes) # get a glimpse of the quakes data
+```
+
+### (a) [30pt] Re-plotting the distribution of earthquake magnitudes.
+
+In Homework 1, Question 1(a), you've plotted the distribution of the earthquake magnitudes using R base graphics. 
+This week, write your own `ggplot2` code to reproduce the following four subfigures in a 2-by-2 layout.  
+
+- subfigure #1: plot a density histogram of the earthquake magnitudes, and then plot the estimated probability density curve in red color in the same plot
+- subfigure #2: plot a horizontal boxplot of the earthquake magnitudes
+- subfigure #3: plot the empirical cdf of the earthquake magnitudes
+- subfigure #4: make a Q-Q plot to compare the observed earthquake magnitudes distribution with the Normal distribution. Add a *thick* Q-Q line in blue color.  
+
+**Hints**: 
+
+- In the lecture notes, we used the `grid.arrange()` function from the `gridExtra` package (see [this vignette](https://cran.r-project.org/web/packages/gridExtra/vignettes/arrangeGrob.html)) to layout multiple plots in a single figure. For alternative options, please refer to [this post](https://cran.r-project.org/web/packages/egg/vignettes/Ecosystem.html). 
+- Check out [the `geom_histogram()` function](http://ggplot2.tidyverse.org/reference/geom_histogram.html) for plotting the **density** histogram.
+- Check out [the `stat_ecdf()` function](http://ggplot2.tidyverse.org/reference/stat_ecdf.html) for plotting the empirical distribution.
+- Check out [the `stat_qq()` and `stat_qq_line()` functions](https://ggplot2.tidyverse.org/reference/geom_qq.html) for plotting the Q-Q plot and Q-Q line.
+
+```{r}
+# plot quakes data where x = mag
+gg_quakes <- ggplot(data = quakes, aes(x = mag)) 
+
+# 1.density histogram of magnitudes + estimated probability density curve in red
+quakes_dh <- ggplot(data = quakes, mapping = aes(x = mag)) + labs(title = "Density Histogram of Magnitudes") + #adds data, title
+  geom_histogram(aes(y = ..density..), bins = 25) + #creates density histogram
+  geom_density(color= "red") #adds density curve in red 
+
+# 2. horizontal boxplot of the earthquake magnitudes
+quakes_box <- gg_quakes + labs(title = "Horizontal Boxplot of Magnitudes") + 
+  geom_boxplot() # create boxplot
+
+# 3. empirical cdf of the earthquake magnitudes
+quakes_ecdf <- gg_quakes + labs(title = "Empirical CDF of Magnitudes") + 
+  stat_ecdf() #plots the ecdf
+
+# 4. Q-Q plot comparing the observed earthquake magnitudes distribution to Normal distribution + thick Q-Q line in blue
+quakes_QQ <- ggplot(quakes, aes(sample = mag)) + labs(title = "QQ Plot: Magnitudes vs Normal Dist") +
+  stat_qq() + # creates qq plot
+  geom_qq_line(color = "blue", size = 2) # adds thick blue qq line
+
+# arrange plots into 2 columns
+grid.arrange(quakes_dh, quakes_box, quakes_ecdf, quakes_QQ, ncol = 2) 
+```
+
+
+### (b) [10pt] Earthquake location map
+
+Make a scatter plot of the earthquake locations. Use `long` as the x-axis and `lat` as the y-axis. Map `mag` to the size aesthetic and `depth` to the color aesthetic.
+
+[**Extra credit 20pt**] If you can plot earthquakes point on top of a map layer, you will earn extra points!
+
+
+```{r}
+
+# plot of only the points
+ggplot() +
+  geom_point(data = quakes, mapping = aes(x = long, y = lat, size = mag, color = depth))
+
+### EXTRA CREDIT 
+
+#retrieving world map
+worldmap <- map_data("world")
+
+ggplot(data = quakes) + 
+  #plotting world map with white fill
+  geom_polygon(data = worldmap, aes(x = long, y = lat, group = group), fill='white', color='grey60') + 
+  #setting background as blank
+  theme_void() +
+  # adding points
+  geom_point(mapping = aes(x = long, y = lat, size = mag, color = depth)) + 
+  # creating a scale for points on a continuous scale
+  scale_size_continuous(range = c(0.3, 1.25)) 
+
+```
